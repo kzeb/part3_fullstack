@@ -52,6 +52,30 @@ app.get("/info", (request, response) => {
     ${new Date(Date.now()).toString()}`);
 });
 
+const generateId = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: "missing data",
+    });
+  }
+
+  const person = {
+    id: generateId(0, 1000000),
+    name: body.name,
+    number: body.number,
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
