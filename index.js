@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/person");
 
 app.use(cors());
 
@@ -36,17 +38,19 @@ let persons = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Person.findById(request.params.id).then((person) => {
+    if (person) {
+      response.json(person);
+    } else {
+      response.status(404).end();
+    }
+  });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -57,8 +61,10 @@ app.delete("/api/persons/:id", (request, response) => {
 });
 
 app.get("/info", (request, response) => {
-  response.send(`Phonebook has info for ${persons.length} people <br><br>
+  Person.find({}).then((persons) => {
+    response.send(`Phonebook has info for ${persons.length} people <br><br>
     ${new Date(Date.now()).toString()}`);
+  });
 });
 
 const generateId = (min, max) => {
