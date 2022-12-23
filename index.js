@@ -50,23 +50,25 @@ app.get("/info", (request, response) => {
 app.post("/api/persons", (request, response, next) => {
   const body = request.body;
 
-  // if (persons.find((person) => person.name === body.name)) {
-  //   return response.status(400).json({
-  //     error: "name must be unique",
-  //   });
-  // }
-
   const person = new Person({
     name: body.name,
     number: body.number,
   });
 
-  person
-    .save()
-    .then((savedPerson) => {
-      response.json(savedPerson);
-    })
-    .catch((error) => next(error));
+  Person.find({}).then((persons) => {
+    if (persons.find((person) => person.name === body.name)) {
+      return response.status(400).json({
+        error: "name must be unique",
+      });
+    } else {
+      person
+        .save()
+        .then((savedPerson) => {
+          response.json(savedPerson);
+        })
+        .catch((error) => next(error));
+    }
+  });
 });
 
 app.put("/api/persons/:id", (request, response, next) => {
